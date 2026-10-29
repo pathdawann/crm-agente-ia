@@ -1,0 +1,154 @@
+---
+// Componente: Bandeja de Chats + Automatizador de Comentarios IG a DM (Fase 2)
+---
+<section id="modulo-chats" class="hidden space-y-6">
+
+  <!-- 1. PANEL SUPERIOR: Automatizador de Comentarios de IG a DM y Simulador en Vivo -->
+  <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-5 shadow-md border border-indigo-500/30">
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-700/80">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+            ⚡ Robot Activo
+          </span>
+          <span class="text-xs text-indigo-200 font-semibold">Conectado a tu Catálogo de Productos</span>
+        </div>
+        <h2 class="text-lg font-extrabold mt-1">📲 Automatizador de Comentarios y DMs de Instagram</h2>
+        <p class="text-xs text-slate-300">
+          Prueba aquí cómo entra un comentario en un post o un DM directo: el Agente responde en público, envía el precio por privado y crea al cliente en el Tablero.
+        </p>
+      </div>
+
+      <!-- Regla de respuesta pública (Editable solo por Admin) -->
+      <div class="solo-admin bg-slate-800/90 p-3 rounded-xl border border-slate-700 min-w-[280px]">
+        <label class="block text-[10px] font-bold uppercase tracking-wider text-indigo-300 mb-1">
+          Respuesta pública en Comentarios (Admin):
+        </label>
+        <input 
+          type="text" 
+          id="inputRespuestaComentarioPublico" 
+          value="Te hemos enviado un DM 📨" 
+          onchange="guardarConfigComentario(this.value)"
+          class="w-full bg-slate-900 text-white text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-600 focus:outline-none focus:border-indigo-400"
+        />
+      </div>
+    </div>
+
+    <!-- Formulario para simular la llegada de un Comentario o un DM real -->
+    <form id="formSimularInteraccionIG" class="grid grid-cols-1 md:grid-cols-12 gap-3 pt-4 items-end">
+      
+      <div class="md:col-span-2">
+        <label class="block text-[11px] font-bold text-slate-300 mb-1">Canal de entrada</label>
+        <select id="simTipoEntrada" class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-600 text-xs font-bold text-white focus:outline-none">
+          <option value="comentario">💬 Comentario en Post</option>
+          <option value="dm">📩 Escribió directo al DM</option>
+        </select>
+      </div>
+
+      <div class="md:col-span-2">
+        <label class="block text-[11px] font-bold text-slate-300 mb-1">Usuario de IG</label>
+        <input type="text" id="simUsuarioIG" required placeholder="@mariagomez" class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-600 text-xs text-white placeholder-slate-400 focus:outline-none" />
+      </div>
+
+      <div class="md:col-span-2">
+        <label class="block text-[11px] font-bold text-slate-300 mb-1">Nombre visible</label>
+        <input type="text" id="simNombreCliente" required placeholder="María Gómez" class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-600 text-xs text-white placeholder-slate-400 focus:outline-none" />
+      </div>
+
+      <div class="md:col-span-3">
+        <label class="block text-[11px] font-bold text-slate-300 mb-1">Post / Producto relacionado</label>
+        <select id="simPostProducto" class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-600 text-xs text-white focus:outline-none"></select>
+      </div>
+
+      <div class="md:col-span-3">
+        <label class="block text-[11px] font-bold text-slate-300 mb-1">¿Qué escribió el cliente?</label>
+        <div class="flex gap-2">
+          <input type="text" id="simTextoCliente" required placeholder="Ej: Hola, precio por favor" class="w-full px-3 py-2 rounded-xl bg-slate-800 border border-slate-600 text-xs text-white placeholder-slate-400 focus:outline-none" />
+          <button type="submit" class="px-4 py-2 bg-indigo-500 hover:bg-indigo-400 text-white font-extrabold text-xs rounded-xl shadow transition shrink-0">
+            Probar ▶
+          </button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- 2. CENTRO DE MENSAJERÍA: Bandeja de Chats por Leer y Atender -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+
+    <!-- Columna Izquierda: Lista de Conversaciones y Filtros -->
+    <div class="lg:col-span-4 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[620px]">
+      
+      <!-- Pestañas de filtro -->
+      <div class="p-3 bg-slate-50 border-b border-slate-200 space-y-2.5">
+        <div class="flex items-center justify-between">
+          <h3 class="font-extrabold text-sm text-slate-900">Bandeja de Entrada</h3>
+          <span id="contadorTotalChats" class="mono text-[11px] font-bold text-slate-500">0 conversaciones</span>
+        </div>
+
+        <div class="grid grid-cols-4 gap-1 bg-slate-200/80 p-1 rounded-xl text-[11px] font-bold">
+          <button id="filtroChat-todos" onclick="filtrarBandejaChats('todos')" class="py-1.5 px-2 rounded-lg bg-white text-slate-900 shadow-sm transition">
+            Todos
+          </button>
+          <button id="filtroChat-humano" onclick="filtrarBandejaChats('humano')" class="py-1.5 px-2 rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-1">
+            🔴 Humano <span id="badgeFiltroHumano" class="mono text-[10px] bg-rose-100 text-rose-700 px-1 rounded">0</span>
+          </button>
+          <button id="filtroChat-no_leido" onclick="filtrarBandejaChats('no_leido')" class="py-1.5 px-2 rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-1">
+            📩 Por leer <span id="badgeFiltroNoLeido" class="mono text-[10px] bg-amber-100 text-amber-800 px-1 rounded">0</span>
+          </button>
+          <button id="filtroChat-ia" onclick="filtrarBandejaChats('ia')" class="py-1.5 px-2 rounded-lg text-slate-600 hover:text-slate-900 transition">
+            🤖 IA
+          </button>
+        </div>
+      </div>
+
+      <!-- Lista scrolleable de chats -->
+      <div id="listaConversaciones" class="flex-1 overflow-y-auto divide-y divide-slate-100"></div>
+    </div>
+
+    <!-- Columna Derecha: Ventana de Conversación Activa -->
+    <div class="lg:col-span-8 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[620px]">
+      
+      <!-- Encabezado del Chat Activo -->
+      <div id="headerChatActivo" class="p-4 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p class="text-xs text-slate-400 font-semibold">Selecciona una conversación a la izquierda</p>
+        </div>
+      </div>
+
+      <!-- Historial de Mensajes (Comentario + DMs) -->
+      <div id="mensajesChatActivo" class="flex-1 overflow-y-auto p-5 space-y-4 bg-slate-50/50"></div>
+
+      <!-- Barra de Simulación Rápida: ¿Qué responde el cliente dentro del DM? -->
+      <div id="barraSimularRespuestaCliente" class="px-4 py-2 bg-indigo-50/80 border-t border-indigo-100 flex flex-wrap items-center justify-between gap-2">
+        <span class="text-[11px] font-bold text-indigo-900">
+          🧪 Simular respuesta del cliente en este DM:
+        </span>
+        <div class="flex flex-wrap items-center gap-1.5">
+          <button onclick="simularRespuestaClienteDM('¿Qué otras tallas o colores tienen?')" class="px-2.5 py-1 rounded-lg bg-white hover:bg-indigo-100 text-indigo-800 border border-indigo-200 text-[11px] font-semibold transition">
+            "¿Qué otras tallas tienen?"
+          </button>
+          <button onclick="simularRespuestaClienteDM('¡La quiero comprar! ¿Cuáles son los datos de pago?')" class="px-2.5 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold shadow-sm transition">
+            🔥 "¡La quiero comprar! ¿Datos de pago?"
+          </button>
+        </div>
+      </div>
+
+      <!-- Caja para que el Admin o el Usuario Adjunto escriba y responda -->
+      <form id="formEnviarMensajeHumano" class="p-3.5 bg-white border-t border-slate-200 flex items-center gap-2">
+        <input 
+          type="text" 
+          id="inputMensajeHumano" 
+          placeholder="Escribe un mensaje como asesor humano para este cliente..." 
+          class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-slate-900"
+        />
+        <button type="submit" class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-bold shadow transition">
+          Enviar al DM ➢
+        </button>
+      </form>
+
+    </div>
+
+  </div>
+
+</section>
