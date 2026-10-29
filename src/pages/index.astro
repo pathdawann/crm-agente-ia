@@ -4,9 +4,10 @@ import TableroKanban from '../components/TableroKanban.astro';
 import CatalogoProductos from '../components/CatalogoProductos.astro';
 import BandejaChats from '../components/BandejaChats.astro';
 import ConfiguradorAgente from '../components/ConfiguradorAgente.astro';
+import PanelEstadisticas from '../components/PanelEstadisticas.astro';
 ---
 
-<LayoutCRM title="CRM Agéntico | Fase 3">
+<LayoutCRM title="CRM Agéntico | Sistema Completo">
   
   <!-- Pieza 1: Tablero de Clientes -->
   <TableroKanban />
@@ -17,17 +18,11 @@ import ConfiguradorAgente from '../components/ConfiguradorAgente.astro';
   <!-- Pieza 3: Catálogo de Productos (Solo Admin) -->
   <CatalogoProductos />
 
-  <!-- Pieza 4: Configurador del Agente IA + Sonido + Telegram (NUEVO EN FASE 3 - Solo Admin) -->
+  <!-- Pieza 4: Configurador del Agente IA + Sonido + Telegram (Solo Admin) -->
   <ConfiguradorAgente />
 
-  <!-- Vista previa de Fase 4 -->
-  <section id="modulo-stats" class="hidden bg-white rounded-2xl border border-slate-200 p-8 text-center">
-    <span class="text-xs font-bold uppercase px-3 py-1 rounded-full bg-emerald-100 text-emerald-800">Próximo paso: Fase 4</span>
-    <h3 class="text-xl font-extrabold text-slate-900 mt-3">📊 Panel de Estadísticas y Conexión en la Nube</h3>
-    <p class="text-sm text-slate-500 max-w-lg mx-auto mt-2">
-      Métricas de leads únicos, conversaciones respondidas por IA, tasa de derivación y despliegue final.
-    </p>
-  </section>
+  <!-- Pieza 5: Panel de Estadísticas y Equipo (NUEVO EN FASE 4 - Solo Admin) -->
+  <PanelEstadisticas />
 
   <!-- Modal para agregar un cliente manual -->
   <div id="modalNuevoCliente" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center p-4 z-50">
@@ -73,15 +68,15 @@ import ConfiguradorAgente from '../components/ConfiguradorAgente.astro';
     </div>
   </div>
 
-  <!-- Motor Javascript Unificado (Fases 1, 2 y 3) -->
+  <!-- Motor Javascript Completo (Fases 1, 2, 3 y 4) -->
   <script is:inline>
     const ETAPAS = ["Pidió info", "Pasé precio", "Esperando pago", "Vendido", "Más adelante"];
     let rolActual = "admin";
     let filtroChatActual = "todos";
     let chatSeleccionadoId = "chat-1";
     let moduloActivoActual = "tablero";
+    let modoEstadisticas = "reales"; // 'reales' o 'muestra'
 
-    // Configuración Inicial del Agente IA (Basada en tus capturas)
     const CONFIG_AGENTE_INICIAL = {
       rol: "Eres un asistente de ventas y consulta proactivo que atiende comentarios y DMs de Instagram. Explicas los productos del catálogo con sus precios y tallas disponibles, respondes dudas con amabilidad y, cuando el cliente está listo para comprar, derivas la conversación a un asesor humano para cerrar el pago.",
       tono: "Amistoso",
@@ -188,11 +183,17 @@ import ConfiguradorAgente from '../components/ConfiguradorAgente.astro';
       }
     ];
 
+    const EQUIPO_INICIAL = [
+      { id: "usr-1", nombre: "Patricia Mago (Tú)", rol: "👑 Administradora Total", fijo: true },
+      { id: "usr-2", nombre: "Asesor de Ventas #1", rol: "👤 Usuario Adjunto (Solo Chats y Tablero)", fijo: false }
+    ];
+
     let configAgente = JSON.parse(localStorage.getItem("crm_fase3_config_agente")) || CONFIG_AGENTE_INICIAL;
     let catalogo = JSON.parse(localStorage.getItem("crm_fase2_catalogo")) || CATALOGO_INICIAL;
     let clientes = JSON.parse(localStorage.getItem("crm_fase2_clientes")) || CLIENTES_INICIALES;
     let chats = JSON.parse(localStorage.getItem("crm_fase2_chats")) || CHATS_INICIALES;
     let alertasTelegram = JSON.parse(localStorage.getItem("crm_fase3_telegram_log")) || ALERTAS_TELEGRAM_INICIALES;
+    let equipoUsuarios = JSON.parse(localStorage.getItem("crm_fase4_equipo")) || EQUIPO_INICIAL;
     let textoRespuestaComentario = localStorage.getItem("crm_fase2_reply_comment") || "Te hemos enviado un DM 📨";
 
     function guardarMemoria() {
@@ -201,22 +202,135 @@ import ConfiguradorAgente from '../components/ConfiguradorAgente.astro';
       localStorage.setItem("crm_fase2_clientes", JSON.stringify(clientes));
       localStorage.setItem("crm_fase2_chats", JSON.stringify(chats));
       localStorage.setItem("crm_fase3_telegram_log", JSON.stringify(alertasTelegram));
+      localStorage.setItem("crm_fase4_equipo", JSON.stringify(equipoUsuarios));
       localStorage.setItem("crm_fase2_reply_comment", textoRespuestaComentario);
+      renderizarEstadisticas();
     }
 
     // =========================================================================
-    // MOTOR DE SONIDO (WEB AUDIO API - NO REQUIERE ARCHIVOS EXTERNOS)
+    // MOTOR DE ESTADÍSTICAS Y GESTIÓN DE EQUIPO (FASE 4)
+    // =========================================================================
+    window.cambiarModoEstadisticas = function(modo) {
+      modoEstadisticas = modo;
+      const esReal = modo === "reales";
+
+      document.getElementById("btnStatsReales").className = esReal
+        ? "px-3.5 py-2 rounded-lg text-xs font-extrabold bg-white text-slate-900 shadow-sm transition"
+        : "px-3.5 py-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition";
+      document.getElementById("btnStatsMuestra").className = !esReal
+        ? "px-3.5 py-2 rounded-lg text-xs font-extrabold bg-white text-slate-900 shadow-sm transition"
+        : "px-3.5 py-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition";
+
+      document.getElementById("avisoDatosMuestra").classList.toggle("hidden", esReal);
+      renderizarEstadisticas();
+    };
+
+    function renderizarEstadisticas() {
+      const elLeads = document.getElementById("statLeadsUnicos");
+      if (!elLeads) return;
+
+      if (modoEstadisticas === "muestra") {
+        // Números de proyección estilo Kommo
+        elLeads.textContent = "531";
+        document.getElementById("statConversacionesIA").textContent = "653";
+        document.getElementById("statTasaDerivacion").textContent = "12%";
+        document.getElementById("statCantDerivados").textContent = "64 derivados";
+        document.getElementById("statTiempoRespuesta").textContent = "25 s";
+        document.getElementById("statSinResponder").textContent = "27";
+        document.getElementById("statRespaldosTelegram").textContent = "64";
+        document.getElementById("statCanalComentarios").textContent = "412 (63%)";
+        document.getElementById("statCanalDM").textContent = "241 (37%)";
+        document.getElementById("barraCanalComentarios").style.width = "63%";
+        document.getElementById("barraCanalDM").style.width = "37%";
+      } else {
+        // Datos Reales en Vivo de tu CRM
+        const totalLeads = clientes.length;
+        const totalChats = chats.length;
+        const derivadosHumano = chats.filter(c => c.estado === "humano").length;
+        const porLeer = chats.filter(c => c.noLeido).length;
+        const tasa = totalChats > 0 ? Math.round((derivadosHumano / totalChats) * 100) : 0;
+
+        // Contar cuántas respuestas automáticas envió la IA
+        let respuestasIA = 0;
+        chats.forEach(c => {
+          respuestasIA += c.mensajes.filter(m => m.autor === "ia_dm" || m.autor === "comentario_bot").length;
+        });
+
+        const porComentario = chats.filter(c => c.origen.includes("Comentario")).length;
+        const porDM = totalChats - porComentario;
+        const pctComentario = totalChats > 0 ? Math.round((porComentario / totalChats) * 100) : 50;
+        const pctDM = totalChats > 0 ? (100 - pctComentario) : 50;
+
+        elLeads.textContent = totalLeads;
+        document.getElementById("statConversacionesIA").textContent = respuestasIA;
+        document.getElementById("statTasaDerivacion").textContent = `${tasa}%`;
+        document.getElementById("statCantDerivados").textContent = `${derivadosHumano} chats derivados`;
+        document.getElementById("statTiempoRespuesta").textContent = `${configAgente.demora} s`;
+        document.getElementById("statSinResponder").textContent = porLeer;
+        document.getElementById("statRespaldosTelegram").textContent = alertasTelegram.length;
+
+        document.getElementById("statCanalComentarios").textContent = `${porComentario} (${pctComentario}%)`;
+        document.getElementById("statCanalDM").textContent = `${porDM} (${pctDM}%)`;
+        document.getElementById("barraCanalComentarios").style.width = `${pctComentario}%`;
+        document.getElementById("barraCanalDM").style.width = `${pctDM}%`;
+      }
+
+      // Desglose por etapas del Tablero
+      const contEtapas = document.getElementById("desgloseEtapasStats");
+      contEtapas.innerHTML = ETAPAS.map(e => {
+        const cant = clientes.filter(c => c.etapa === e).length;
+        return `
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-center">
+            <span class="mono text-xl font-extrabold text-slate-900 block">${cant}</span>
+            <span class="text-[11px] font-bold text-slate-500">${e}</span>
+          </div>
+        `;
+      }).join("");
+
+      // Lista de Usuarios del Equipo
+      const contEquipo = document.getElementById("listaUsuariosEquipo");
+      contEquipo.innerHTML = equipoUsuarios.map(u => `
+        <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200">
+          <div>
+            <p class="text-xs font-extrabold text-slate-900">${u.nombre}</p>
+            <p class="text-[11px] text-slate-500">${u.rol}</p>
+          </div>
+          ${!u.fijo ? `<button onclick="eliminarUsuarioEquipo('${u.id}')" class="text-xs font-bold text-rose-600 hover:underline">Quitar</button>` : `<span class="text-[10px] font-bold bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded">Principal</span>`}
+        </div>
+      `).join("");
+    }
+
+    window.eliminarUsuarioEquipo = function(id) {
+      equipoUsuarios = equipoUsuarios.filter(u => u.id !== id);
+      guardarMemoria();
+    };
+
+    document.getElementById("formNuevoUsuarioEquipo").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const input = document.getElementById("inputNombreMiembro");
+      if (!input.value.trim()) return;
+      equipoUsuarios.push({
+        id: "usr-" + Date.now(),
+        nombre: input.value.trim(),
+        rol: "👤 Usuario Adjunto (Solo Chats y Tablero)",
+        fijo: false
+      });
+      input.value = "";
+      guardarMemoria();
+    });
+
+    // =========================================================================
+    // SONIDO Y TELEGRAM (FASE 3)
     // =========================================================================
     window.reproducirSonidoAlertaVenta = function() {
       try {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
         const ctx = new AudioCtx();
 
-        // Primer tono (Campana aguda amigable)
         const osc1 = ctx.createOscillator();
         const gain1 = ctx.createGain();
         osc1.type = "sine";
-        osc1.frequency.setValueAtTime(587.33, ctx.currentTime); // Nota Re (D5)
+        osc1.frequency.setValueAtTime(587.33, ctx.currentTime);
         gain1.gain.setValueAtTime(0.25, ctx.currentTime);
         gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
         osc1.connect(gain1);
@@ -224,11 +338,10 @@ import ConfiguradorAgente from '../components/ConfiguradorAgente.astro';
         osc1.start();
         osc1.stop(ctx.currentTime + 0.35);
 
-        // Segundo tono (Acorde de confirmación)
         const osc2 = ctx.createOscillator();
         const gain2 = ctx.createGain();
         osc2.type = "sine";
-        osc2.frequency.setValueAtTime(880, ctx.currentTime + 0.16); // Nota La (A5)
+        osc2.frequency.setValueAtTime(880, ctx.currentTime + 0.16);
         gain2.gain.setValueAtTime(0.3, ctx.currentTime + 0.16);
         gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.7);
         osc2.connect(gain2);
@@ -236,26 +349,20 @@ import ConfiguradorAgente from '../components/ConfiguradorAgente.astro';
         osc2.start(ctx.currentTime + 0.16);
         osc2.stop(ctx.currentTime + 0.7);
       } catch (e) {
-        console.log("Audio esperando interacción del navegador");
+        console.log("Audio listo");
       }
     };
 
-    // =========================================================================
-    // MOTOR DE RESPALDO EN TELEGRAM + NOTIFICACIÓN EN PANTALLA
-    // =========================================================================
     async function dispararAlertaCompra(clienteNombre, clienteIG, productoNombre, ultimoMensajeCliente) {
-      // 1. Reproducir sonido si está activo
       if (configAgente.sonidoActivo) {
         reproducirSonidoAlertaVenta();
       }
 
-      // 2. Mostrar notificación emergente en la esquina de la pantalla
       const toast = document.getElementById("toastAlertaVenta");
       document.getElementById("toastTituloCliente").textContent = `${clienteNombre} (${clienteIG})`;
       document.getElementById("toastDetalleVenta").textContent = `Quiere comprar: ${productoNombre} — "${ultimoMensajeCliente}"`;
       toast.classList.remove("hidden");
 
-      // 3. Crear registro en la bitácora de respaldo y enviar a Telegram si tiene Token configurado
       let estadoEnvio = "Respaldo guardado en bitácora del CRM";
       const textoTelegram = `🚨 *NUEVA SOLICITUD DE COMPRA*\n\n👤 *Cliente:* ${clienteNombre} (${clienteIG})\n🛍️ *Producto:* ${productoNombre}\n💬 *Mensaje:* "${ultimoMensajeCliente}"\n📌 *Estado:* Derivado a Admin en etapa 'Esperando pago'.`;
 
@@ -324,7 +431,7 @@ import ConfiguradorAgente from '../components/ConfiguradorAgente.astro';
     }
 
     // =========================================================================
-    // CONFIGURADOR DEL AGENTE IA (SUB-PESTAÑAS Y PAUTAS)
+    // CONFIGURADOR DEL AGENTE IA
     // =========================================================================
     window.cambiarSubtabAgente = function(subtab) {
       ["personalidad", "acciones", "alertas"].forEach(s => {
@@ -355,7 +462,7 @@ import ConfiguradorAgente from '../components/ConfiguradorAgente.astro';
       cont.innerHTML = configAgente.pautas.map((p, idx) => `
         <div class="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800">
           <span>${p}</span>
-          <button onclick="eliminarPautaAgente(${idx})" class="text-rose-500 hover:text-rose-700 font-bold shrink-0" title="Eliminar pauta">🗑️</button>
+          <button onclick="eliminarPautaAgente(${idx})" class="text-rose-500 hover:text-rose-700 font-bold shrink-0">🗑️</button>
         </div>
       `).join("");
     }
@@ -442,6 +549,8 @@ import ConfiguradorAgente from '../components/ConfiguradorAgente.astro';
             : "px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-100 transition flex items-center gap-2";
         }
       });
+
+      if (modulo === "stats") renderizarEstadisticas();
     };
 
     function renderizarCatalogo() {
@@ -547,7 +656,6 @@ import ConfiguradorAgente from '../components/ConfiguradorAgente.astro';
       const cli = clientes.find(c => c.id === id);
       if (cli) {
         cli.etapa = nuevaEtapa;
-        // Condición de parada automática: si entra a Esperando pago o Vendido, el Agente IA cede el control al humano
         const ch = chats.find(chat => chat.clienteId === id);
         if (ch && ["Esperando pago", "Vendido"].includes(nuevaEtapa)) {
           ch.estado = "humano";
@@ -739,7 +847,6 @@ import ConfiguradorAgente from '../components/ConfiguradorAgente.astro';
       renderizarBandejaChats();
     };
 
-    // Seguimiento por inactividad: Exactamente 1 oración, sin saludos, continuando el tema del cliente
     window.ejecutarSeguimientoInactividad = function() {
       const ch = chats.find(c => c.id === chatSeleccionadoId);
       if (!ch) return;
@@ -756,7 +863,6 @@ import ConfiguradorAgente from '../components/ConfiguradorAgente.astro';
       renderizarBandejaChats();
     };
 
-    // Simular respuesta del cliente en DM + Detección de Compra con Sonido y Telegram
     window.simularRespuestaClienteDM = function(textoCliente) {
       const ch = chats.find(c => c.id === chatSeleccionadoId);
       if (!ch) return;
@@ -778,7 +884,6 @@ import ConfiguradorAgente from '../components/ConfiguradorAgente.astro';
           cli.nota = "🔥 Listo para comprar -> Alerta enviada a Admin y Telegram.";
         }
 
-        // Usa el mensaje de transferencia configurado en Ajustes del Agente
         ch.mensajes.push({
           autor: "ia_dm",
           texto: configAgente.mensajeTransferencia,
@@ -915,12 +1020,13 @@ import ConfiguradorAgente from '../components/ConfiguradorAgente.astro';
       e.target.reset();
     });
 
-    // Inicializar todo el CRM (Fase 1 + 2 + 3)
+    // Inicializar todo el CRM (Fases 1, 2, 3 y 4)
     document.getElementById("inputRespuestaComentarioPublico").value = textoRespuestaComentario;
     cargarFormularioAgente();
     renderizarCatalogo();
     renderizarTablero();
     renderizarBandejaChats();
+    renderizarEstadisticas();
   </script>
 
 </LayoutCRM>

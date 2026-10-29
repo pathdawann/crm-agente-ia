@@ -1,0 +1,185 @@
+---
+// Componente: Panel de Estadísticas del Agente IA + Equipo y Canales (Fase 4 - Solo Admin)
+---
+<section id="modulo-stats" class="hidden space-y-6">
+
+  <!-- Encabezado y Selector de Datos Reales vs Muestra -->
+  <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-md">
+        Rendimiento del Agente IA (Solo Admin)
+      </span>
+      <h2 class="text-xl font-extrabold text-slate-900 mt-1">📊 Actividad y Estadísticas del CRM Agéntico</h2>
+      <p class="text-sm text-slate-500">
+        Comprende cómo tu Agente de IA influye en la captación de leads, cuántas conversaciones atiende y cuántos cierres deriva a tu equipo.
+      </p>
+    </div>
+
+    <!-- Barra para alternar entre Datos Reales de tu CRM y Datos de Muestra -->
+    <div class="flex items-center gap-2 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+      <button id="btnStatsReales" onclick="cambiarModoEstadisticas('reales')" class="px-3.5 py-2 rounded-lg text-xs font-extrabold bg-white text-slate-900 shadow-sm transition">
+        🟢 Datos Reales en Vivo
+      </button>
+      <button id="btnStatsMuestra" onclick="cambiarModoEstadisticas('muestra')" class="px-3.5 py-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition">
+        🧪 Ver Proyección (Datos de muestra)
+      </button>
+    </div>
+  </div>
+
+  <!-- Aviso cuando están activos los datos de muestra -->
+  <div id="avisoDatosMuestra" class="hidden bg-sky-50 border border-sky-200 text-sky-900 rounded-xl p-3.5 text-xs font-semibold flex items-center justify-between">
+    <span>ℹ️ Estás viendo una proyección de alto volumen (531 leads). Cambia a "Datos Reales en Vivo" para ver los números exactos de tu tablero actual.</span>
+    <button onclick="cambiarModoEstadisticas('reales')" class="underline font-extrabold ml-3">Volver a datos reales</button>
+  </div>
+
+  <!-- 1. TARJETAS DE MÉTRICAS PRINCIPALES -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    
+    <!-- Leads únicos -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+      <span class="text-xs font-bold text-slate-500">Leads únicos captados</span>
+      <div class="flex items-baseline gap-2.5 mt-2">
+        <span id="statLeadsUnicos" class="mono text-3xl font-extrabold text-slate-900">0</span>
+        <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">▲ Activo en IG</span>
+      </div>
+      <p class="text-[11px] text-slate-400 mt-1">Clientes registrados en tu Tablero Kanban</p>
+    </div>
+
+    <!-- Conversaciones respondidas -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+      <span class="text-xs font-bold text-slate-500">Conversaciones respondidas por IA</span>
+      <div class="flex items-baseline gap-2.5 mt-2">
+        <span id="statConversacionesIA" class="mono text-3xl font-extrabold text-indigo-600">0</span>
+        <span class="text-xs font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md">🤖 Automático 24/7</span>
+      </div>
+      <p class="text-[11px] text-slate-400 mt-1">Respuestas enviadas en comentarios y DMs</p>
+    </div>
+
+    <!-- Tasa de derivación a humano -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+      <span class="text-xs font-bold text-slate-500">Tasa de derivación a humano (Intención de compra)</span>
+      <div class="flex items-baseline gap-2.5 mt-2">
+        <span id="statTasaDerivacion" class="mono text-3xl font-extrabold text-rose-600">0%</span>
+        <span id="statCantDerivados" class="text-xs font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md">0 chats derivados</span>
+      </div>
+      <p class="text-[11px] text-slate-400 mt-1">Clientes listos para pagar pasados al Admin</p>
+    </div>
+
+    <!-- Tiempo promedio de respuesta -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+      <span class="text-xs font-bold text-slate-500">Tiempo promedio de respuesta IA</span>
+      <div class="flex items-baseline gap-2.5 mt-2">
+        <span id="statTiempoRespuesta" class="mono text-3xl font-extrabold text-slate-900">3 s</span>
+        <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">▼ Instantáneo</span>
+      </div>
+      <p class="text-[11px] text-slate-400 mt-1">Según la demora configurada en tu Agente IA</p>
+    </div>
+
+    <!-- Preguntas sin responder (Por leer) -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+      <span class="text-xs font-bold text-slate-500">Conversaciones por leer / atender</span>
+      <div class="flex items-baseline gap-2.5 mt-2">
+        <span id="statSinResponder" class="mono text-3xl font-extrabold text-amber-600">0</span>
+        <span class="text-xs font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md">📩 En Bandeja</span>
+      </div>
+      <p class="text-[11px] text-slate-400 mt-1">Chats esperando lectura de Admin o Equipo</p>
+    </div>
+
+    <!-- Solicitudes respaldadas en Telegram -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+      <span class="text-xs font-bold text-slate-500">Solicitudes respaldadas en Telegram</span>
+      <div class="flex items-baseline gap-2.5 mt-2">
+        <span id="statRespaldosTelegram" class="mono text-3xl font-extrabold text-sky-600">0</span>
+        <span class="text-xs font-bold text-sky-800 bg-sky-50 px-2 py-0.5 rounded-md">✈️ Bitácora segura</span>
+      </div>
+      <p class="text-[11px] text-slate-400 mt-1">Avisos de compra enviados a tu respaldo</p>
+    </div>
+
+  </div>
+
+  <!-- 2. DESGLOSE POR CANAL Y EMBUDO DE VENTAS -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    
+    <!-- Origen de las conversaciones y Embudo -->
+    <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-5">
+      <div>
+        <h3 class="font-extrabold text-base text-slate-900">📈 Conversaciones por Canal y Avance del Embudo</h3>
+        <p class="text-xs text-slate-500">Distribución de tus clientes según cómo llegaron y en qué etapa se encuentran hoy.</p>
+      </div>
+
+      <!-- Barras por canal de entrada -->
+      <div class="space-y-3">
+        <div>
+          <div class="flex justify-between text-xs font-bold mb-1">
+            <span class="text-slate-700">💬 Comentarios en Post de Instagram (Redirigidos a DM)</span>
+            <span id="statCanalComentarios" class="mono text-indigo-600">0</span>
+          </div>
+          <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+            <div id="barraCanalComentarios" class="h-full bg-indigo-600 rounded-full transition-all duration-300" style="width: 50%"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs font-bold mb-1">
+            <span class="text-slate-700">📩 Escribieron directo al DM de Instagram</span>
+            <span id="statCanalDM" class="mono text-emerald-600">0</span>
+          </div>
+          <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+            <div id="barraCanalDM" class="h-full bg-emerald-500 rounded-full transition-all duration-300" style="width: 50%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resumen por cada etapa del Tablero -->
+      <div class="pt-4 border-t border-slate-100">
+        <span class="block text-xs font-extrabold uppercase text-slate-400 mb-3">Distribución actual en tu Tablero Kanban:</span>
+        <div id="desgloseEtapasStats" class="grid grid-cols-2 sm:grid-cols-5 gap-2.5"></div>
+      </div>
+    </div>
+
+    <!-- 3. GESTIÓN DE EQUIPO (USUARIOS ADJUNTOS) Y CANAL CONECTADO -->
+    <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-5">
+      
+      <!-- Canal de Instagram Conectado -->
+      <div class="p-4 rounded-xl bg-slate-900 text-white space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-400 bg-emerald-500/20 px-2 py-0.5 rounded">
+            ● Canal IG Creador Activo
+          </span>
+          <span class="mono text-xs text-slate-400">Todas las etapas</span>
+        </div>
+        <div class="flex items-center justify-between pt-1">
+          <div>
+            <h4 class="font-extrabold text-sm">Instagram: @patriciamdev</h4>
+            <p class="text-[11px] text-slate-400">Comentarios a DM + Agente IA 24/7</p>
+          </div>
+          <button onclick="mostrarModulo('agente')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-bold border border-slate-700 transition">
+            Ajustar IA
+          </button>
+        </div>
+      </div>
+
+      <!-- Lista de Usuarios Adjuntos (Equipo de atención) -->
+      <div class="space-y-3">
+        <div>
+          <h3 class="font-extrabold text-base text-slate-900">👥 Equipo y Usuarios Adjuntos</h3>
+          <p class="text-xs text-slate-500">
+            Los usuarios adjuntos solo tienen permiso para atender la Bandeja de Chats y mover clientes en el Tablero.
+          </p>
+        </div>
+
+        <div id="listaUsuariosEquipo" class="space-y-2"></div>
+
+        <form id="formNuevoUsuarioEquipo" class="flex gap-2 pt-1">
+          <input type="text" id="inputNombreMiembro" required placeholder="Nombre del vendedor/asistente..." class="flex-1 px-3 py-2 rounded-xl border border-slate-300 text-xs focus:outline-none focus:border-indigo-600" />
+          <button type="submit" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shrink-0 transition">
+            + Agregar Adjunto
+          </button>
+        </form>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
