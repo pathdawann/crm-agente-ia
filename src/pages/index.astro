@@ -3,33 +3,29 @@ import LayoutCRM from '../layouts/LayoutCRM.astro';
 import TableroKanban from '../components/TableroKanban.astro';
 import CatalogoProductos from '../components/CatalogoProductos.astro';
 import BandejaChats from '../components/BandejaChats.astro';
+import ConfiguradorAgente from '../components/ConfiguradorAgente.astro';
 ---
 
-<LayoutCRM title="CRM Agéntico | Fase 2">
+<LayoutCRM title="CRM Agéntico | Fase 3">
   
   <!-- Pieza 1: Tablero de Clientes -->
   <TableroKanban />
 
-  <!-- Pieza 2: Bandeja de Chats y Automatizador de Comentarios a DM (NUEVO EN FASE 2) -->
+  <!-- Pieza 2: Bandeja de Chats y Automatizador de Comentarios a DM -->
   <BandejaChats />
 
   <!-- Pieza 3: Catálogo de Productos (Solo Admin) -->
   <CatalogoProductos />
 
-  <!-- Vista previa de las siguientes fases -->
-  <section id="modulo-agente" class="hidden bg-white rounded-2xl border border-slate-200 p-8 text-center">
-    <span class="text-xs font-bold uppercase px-3 py-1 rounded-full bg-indigo-100 text-indigo-800">Próximo paso: Fase 3</span>
-    <h3 class="text-xl font-extrabold text-slate-900 mt-3">🤖 Entrenamiento del Agente IA + Alertas Sonoras y Telegram</h3>
-    <p class="text-sm text-slate-500 max-w-lg mx-auto mt-2">
-      Aquí conectaremos las pautas avanzadas del Agente, el timbre sonoro en computadora y el envío automático de respaldo a tu Telegram cuando un cliente pida comprar.
-    </p>
-  </section>
+  <!-- Pieza 4: Configurador del Agente IA + Sonido + Telegram (NUEVO EN FASE 3 - Solo Admin) -->
+  <ConfiguradorAgente />
 
+  <!-- Vista previa de Fase 4 -->
   <section id="modulo-stats" class="hidden bg-white rounded-2xl border border-slate-200 p-8 text-center">
-    <span class="text-xs font-bold uppercase px-3 py-1 rounded-full bg-emerald-100 text-emerald-800">Fase 4</span>
+    <span class="text-xs font-bold uppercase px-3 py-1 rounded-full bg-emerald-100 text-emerald-800">Próximo paso: Fase 4</span>
     <h3 class="text-xl font-extrabold text-slate-900 mt-3">📊 Panel de Estadísticas y Conexión en la Nube</h3>
     <p class="text-sm text-slate-500 max-w-lg mx-auto mt-2">
-      Métricas de leads captados, conversaciones respondidas por IA y despliegue en Vercel.
+      Métricas de leads únicos, conversaciones respondidas por IA, tasa de derivación y despliegue final.
     </p>
   </section>
 
@@ -77,14 +73,35 @@ import BandejaChats from '../components/BandejaChats.astro';
     </div>
   </div>
 
-  <!-- Motor Javascript Unificado (Fase 1 + Fase 2) -->
+  <!-- Motor Javascript Unificado (Fases 1, 2 y 3) -->
   <script is:inline>
     const ETAPAS = ["Pidió info", "Pasé precio", "Esperando pago", "Vendido", "Más adelante"];
     let rolActual = "admin";
     let filtroChatActual = "todos";
     let chatSeleccionadoId = "chat-1";
+    let moduloActivoActual = "tablero";
 
-    // 1. Datos Iniciales del Catálogo
+    // Configuración Inicial del Agente IA (Basada en tus capturas)
+    const CONFIG_AGENTE_INICIAL = {
+      rol: "Eres un asistente de ventas y consulta proactivo que atiende comentarios y DMs de Instagram. Explicas los productos del catálogo con sus precios y tallas disponibles, respondes dudas con amabilidad y, cuando el cliente está listo para comprar, derivas la conversación a un asesor humano para cerrar el pago.",
+      tono: "Amistoso",
+      longitud: "Media",
+      demora: 3,
+      limiteMensajes: 20,
+      mensajeTransferencia: "Voy a derivar nuestra conversación a un especialista. Se pondrá en contacto contigo en breve.",
+      sonidoActivo: true,
+      tgBotToken: "",
+      tgChatId: "",
+      pautas: [
+        "Comunica en primera persona, como un representante real de la marca, manteniendo un tono amigable y profesional.",
+        "Saluda al cliente si es la primera interacción y su mensaje contiene un saludo.",
+        "Solicita aclaraciones de manera cortés si la información proporcionada es incompleta o poco clara.",
+        "Informa siempre el precio exacto y las tallas o variantes disponibles según el Catálogo.",
+        "Cierra cada conversación confirmando los próximos pasos para reservar o comprar el producto.",
+        "Cuando el cliente no responde: envía exactamente 1 oración continuando el tema sin saludos ni anuncios."
+      ]
+    };
+
     const CATALOGO_INICIAL = [
       {
         id: "prod-1",
@@ -104,7 +121,6 @@ import BandejaChats from '../components/BandejaChats.astro';
       }
     ];
 
-    // 2. Datos Iniciales del Tablero
     const CLIENTES_INICIALES = [
       {
         id: "cli-1",
@@ -124,7 +140,6 @@ import BandejaChats from '../components/BandejaChats.astro';
       }
     ];
 
-    // 3. Datos Iniciales de la Bandeja de Chats
     const CHATS_INICIALES = [
       {
         id: "chat-1",
@@ -133,25 +148,13 @@ import BandejaChats from '../components/BandejaChats.astro';
         ig: "@danirojas_ve",
         producto: "Franela Negra Talla XS",
         origen: "Comentario en Post IG",
-        estado: "ia", // 'ia', 'humano'
+        estado: "ia",
         noLeido: true,
         hora: "Hace 2 min",
         mensajes: [
-          {
-            autor: "comentario_cliente",
-            texto: "Hola! precio de la franela negra por favor 🙌",
-            hora: "10:14 AM"
-          },
-          {
-            autor: "comentario_bot",
-            texto: "Te hemos enviado un DM 📨",
-            hora: "10:14 AM"
-          },
-          {
-            autor: "ia_dm",
-            texto: "¡Hola! Un gusto saludarte. El costo de la Franela Negra Talla XS es de $25, también tenemos otras tallas (S, M, L) y modelos por si te interesa. ¿Te gustaría reservar alguna?",
-            hora: "10:14 AM"
-          }
+          { autor: "comentario_cliente", texto: "Hola! precio de la franela negra por favor 🙌", hora: "10:14 AM" },
+          { autor: "comentario_bot", texto: "Te hemos enviado un DM 📨", hora: "10:14 AM" },
+          { autor: "ia_dm", texto: "¡Hola! Un gusto saludarte. El costo de la Franela Negra Talla XS es de $25, también tenemos otras tallas (S, M, L) y modelos por si te interesa. ¿Te gustaría reservar alguna?", hora: "10:14 AM" }
         ]
       },
       {
@@ -161,52 +164,239 @@ import BandejaChats from '../components/BandejaChats.astro';
         ig: "@carlosmendez",
         producto: "Conjunto Deportivo Edición Especial",
         origen: "Escribió directo al DM",
-        estado: "humano", // Requiere atención de admin/equipo para cerrar venta
+        estado: "humano",
         noLeido: true,
         hora: "Hace 5 min",
         mensajes: [
-          {
-            autor: "cliente_dm",
-            texto: "Buenas tardes, vi el Conjunto Deportivo en sus historias, ¿qué precio tiene?",
-            hora: "10:08 AM"
-          },
-          {
-            autor: "ia_dm",
-            texto: "¡Hola Carlos! Un gusto saludarte. El costo del Conjunto Deportivo Edición Especial es de $45, también tenemos tallas S y M en color negro y azul marino por si te interesa.",
-            hora: "10:08 AM"
-          },
-          {
-            autor: "cliente_dm",
-            texto: "¡Excelente! Quiero comprar el talla M negro, ¿a dónde transfiero?",
-            hora: "10:10 AM"
-          },
-          {
-            autor: "sistema",
-            texto: "🔴 Intención de compra detectada: El Agente IA pausó su respuesta y notificó al Admin para enviar datos de pago y cerrar la venta.",
-            hora: "10:10 AM"
-          }
+          { autor: "cliente_dm", texto: "Buenas tardes, vi el Conjunto Deportivo en sus historias, ¿qué precio tiene?", hora: "10:08 AM" },
+          { autor: "ia_dm", texto: "¡Hola Carlos! Un gusto saludarte. El costo del Conjunto Deportivo Edición Especial es de $45, también tenemos tallas S y M en color negro y azul marino por si te interesa.", hora: "10:08 AM" },
+          { autor: "cliente_dm", texto: "¡Excelente! Quiero comprar el talla M negro, ¿a dónde transfiero?", hora: "10:10 AM" },
+          { autor: "ia_dm", texto: "Voy a derivar nuestra conversación a un especialista. Se pondrá en contacto contigo en breve.", hora: "10:10 AM" },
+          { autor: "sistema", texto: "🔴 Intención de compra detectada: Alerta sonora activada y ficha de respaldo enviada a Telegram.", hora: "10:10 AM" }
         ]
       }
     ];
 
+    const ALERTAS_TELEGRAM_INICIALES = [
+      {
+        id: "tg-1",
+        fecha: "Hoy, 10:10 AM",
+        cliente: "Carlos Méndez (@carlosmendez)",
+        producto: "Conjunto Deportivo Edición Especial ($45)",
+        ultimoMensaje: "¡Excelente! Quiero comprar el talla M negro, ¿a dónde transfiero?",
+        estadoEnvio: "Guardado en respaldo local"
+      }
+    ];
+
+    let configAgente = JSON.parse(localStorage.getItem("crm_fase3_config_agente")) || CONFIG_AGENTE_INICIAL;
     let catalogo = JSON.parse(localStorage.getItem("crm_fase2_catalogo")) || CATALOGO_INICIAL;
     let clientes = JSON.parse(localStorage.getItem("crm_fase2_clientes")) || CLIENTES_INICIALES;
     let chats = JSON.parse(localStorage.getItem("crm_fase2_chats")) || CHATS_INICIALES;
+    let alertasTelegram = JSON.parse(localStorage.getItem("crm_fase3_telegram_log")) || ALERTAS_TELEGRAM_INICIALES;
     let textoRespuestaComentario = localStorage.getItem("crm_fase2_reply_comment") || "Te hemos enviado un DM 📨";
 
     function guardarMemoria() {
+      localStorage.setItem("crm_fase3_config_agente", JSON.stringify(configAgente));
       localStorage.setItem("crm_fase2_catalogo", JSON.stringify(catalogo));
       localStorage.setItem("crm_fase2_clientes", JSON.stringify(clientes));
       localStorage.setItem("crm_fase2_chats", JSON.stringify(chats));
+      localStorage.setItem("crm_fase3_telegram_log", JSON.stringify(alertasTelegram));
       localStorage.setItem("crm_fase2_reply_comment", textoRespuestaComentario);
     }
 
+    // =========================================================================
+    // MOTOR DE SONIDO (WEB AUDIO API - NO REQUIERE ARCHIVOS EXTERNOS)
+    // =========================================================================
+    window.reproducirSonidoAlertaVenta = function() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        const ctx = new AudioCtx();
+
+        // Primer tono (Campana aguda amigable)
+        const osc1 = ctx.createOscillator();
+        const gain1 = ctx.createGain();
+        osc1.type = "sine";
+        osc1.frequency.setValueAtTime(587.33, ctx.currentTime); // Nota Re (D5)
+        gain1.gain.setValueAtTime(0.25, ctx.currentTime);
+        gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+        osc1.connect(gain1);
+        gain1.connect(ctx.destination);
+        osc1.start();
+        osc1.stop(ctx.currentTime + 0.35);
+
+        // Segundo tono (Acorde de confirmación)
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.type = "sine";
+        osc2.frequency.setValueAtTime(880, ctx.currentTime + 0.16); // Nota La (A5)
+        gain2.gain.setValueAtTime(0.3, ctx.currentTime + 0.16);
+        gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.7);
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.start(ctx.currentTime + 0.16);
+        osc2.stop(ctx.currentTime + 0.7);
+      } catch (e) {
+        console.log("Audio esperando interacción del navegador");
+      }
+    };
+
+    // =========================================================================
+    // MOTOR DE RESPALDO EN TELEGRAM + NOTIFICACIÓN EN PANTALLA
+    // =========================================================================
+    async function dispararAlertaCompra(clienteNombre, clienteIG, productoNombre, ultimoMensajeCliente) {
+      // 1. Reproducir sonido si está activo
+      if (configAgente.sonidoActivo) {
+        reproducirSonidoAlertaVenta();
+      }
+
+      // 2. Mostrar notificación emergente en la esquina de la pantalla
+      const toast = document.getElementById("toastAlertaVenta");
+      document.getElementById("toastTituloCliente").textContent = `${clienteNombre} (${clienteIG})`;
+      document.getElementById("toastDetalleVenta").textContent = `Quiere comprar: ${productoNombre} — "${ultimoMensajeCliente}"`;
+      toast.classList.remove("hidden");
+
+      // 3. Crear registro en la bitácora de respaldo y enviar a Telegram si tiene Token configurado
+      let estadoEnvio = "Respaldo guardado en bitácora del CRM";
+      const textoTelegram = `🚨 *NUEVA SOLICITUD DE COMPRA*\n\n👤 *Cliente:* ${clienteNombre} (${clienteIG})\n🛍️ *Producto:* ${productoNombre}\n💬 *Mensaje:* "${ultimoMensajeCliente}"\n📌 *Estado:* Derivado a Admin en etapa 'Esperando pago'.`;
+
+      if (configAgente.tgBotToken && configAgente.tgChatId) {
+        try {
+          const url = `https://api.telegram.org/bot${configAgente.tgBotToken}/sendMessage`;
+          const res = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              chat_id: configAgente.tgChatId,
+              text: textoTelegram,
+              parse_mode: "Markdown"
+            })
+          });
+          estadoEnvio = res.ok ? "✅ Enviado a tu Telegram en vivo" : "⚠️ Guardado en bitácora (Revisa tu Token/Chat ID)";
+        } catch (err) {
+          estadoEnvio = "⚠️ Guardado en bitácora local";
+        }
+      }
+
+      alertasTelegram.unshift({
+        id: "tg-" + Date.now(),
+        fecha: "Ahora mismo",
+        cliente: `${clienteNombre} (${clienteIG})`,
+        producto: productoNombre,
+        ultimoMensaje: ultimoMensajeCliente,
+        estadoEnvio: estadoEnvio
+      });
+
+      guardarMemoria();
+      renderizarBitacoraTelegram();
+    }
+
+    window.cerrarToastAlerta = function() {
+      document.getElementById("toastAlertaVenta").classList.add("hidden");
+    };
+
+    window.probarEnvioTelegram = function() {
+      guardarAjustesAgente();
+      dispararAlertaCompra(
+        "Cliente de Prueba",
+        "@prueba_ig",
+        "Franela Negra Talla XS ($25)",
+        "¡Hola! Quiero pagar la Franela Negra XS ahora mismo."
+      );
+    };
+
+    function renderizarBitacoraTelegram() {
+      const contenedor = document.getElementById("bitacoraTelegram");
+      const contador = document.getElementById("contadorAlertasTelegram");
+      if (!contenedor) return;
+
+      contador.textContent = `${alertasTelegram.length} respaldos`;
+      contenedor.innerHTML = alertasTelegram.map(a => `
+        <div class="bg-slate-800/90 border border-slate-700 rounded-xl p-3.5 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-extrabold text-sky-400">🚨 ALERTA DE COMPRA • ${a.fecha}</span>
+            <span class="text-[10px] bg-slate-900 text-slate-300 px-2 py-0.5 rounded-md">${a.estadoEnvio}</span>
+          </div>
+          <p class="text-xs font-bold text-white">👤 Cliente: ${a.cliente}</p>
+          <p class="text-xs text-emerald-300 font-semibold">🛍️ Producto: ${a.producto}</p>
+          <p class="text-xs text-slate-300 italic">"${a.ultimoMensaje}"</p>
+        </div>
+      `).join("");
+    }
+
+    // =========================================================================
+    // CONFIGURADOR DEL AGENTE IA (SUB-PESTAÑAS Y PAUTAS)
+    // =========================================================================
+    window.cambiarSubtabAgente = function(subtab) {
+      ["personalidad", "acciones", "alertas"].forEach(s => {
+        document.getElementById(`subtab-${s}`).classList.toggle("hidden", s !== subtab);
+        const btn = document.getElementById(`subtab-btn-${s}`);
+        btn.className = (s === subtab)
+          ? "px-3.5 py-2 rounded-lg text-xs font-extrabold bg-white text-slate-900 shadow-sm transition flex items-center gap-1"
+          : "px-3.5 py-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition flex items-center gap-1";
+      });
+    };
+
+    function cargarFormularioAgente() {
+      document.getElementById("iaRol").value = configAgente.rol;
+      document.getElementById("iaTono").value = configAgente.tono;
+      document.getElementById("iaLongitud").value = configAgente.longitud;
+      document.getElementById("iaDemora").value = configAgente.demora;
+      document.getElementById("iaLimiteMensajes").value = configAgente.limiteMensajes;
+      document.getElementById("iaMensajeTransferencia").value = configAgente.mensajeTransferencia;
+      document.getElementById("checkSonidoActivo").checked = configAgente.sonidoActivo;
+      document.getElementById("tgBotToken").value = configAgente.tgBotToken || "";
+      document.getElementById("tgChatId").value = configAgente.tgChatId || "";
+      renderizarPautasAgente();
+      renderizarBitacoraTelegram();
+    }
+
+    function renderizarPautasAgente() {
+      const cont = document.getElementById("listaPautasAgente");
+      cont.innerHTML = configAgente.pautas.map((p, idx) => `
+        <div class="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800">
+          <span>${p}</span>
+          <button onclick="eliminarPautaAgente(${idx})" class="text-rose-500 hover:text-rose-700 font-bold shrink-0" title="Eliminar pauta">🗑️</button>
+        </div>
+      `).join("");
+    }
+
+    window.eliminarPautaAgente = function(idx) {
+      configAgente.pautas.splice(idx, 1);
+      guardarMemoria();
+      renderizarPautasAgente();
+    };
+
+    document.getElementById("formNuevaPauta").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const input = document.getElementById("inputNuevaPauta");
+      if (!input.value.trim()) return;
+      configAgente.pautas.push(input.value.trim());
+      input.value = "";
+      guardarMemoria();
+      renderizarPautasAgente();
+    });
+
+    window.guardarAjustesAgente = function() {
+      configAgente.rol = document.getElementById("iaRol").value.trim();
+      configAgente.tono = document.getElementById("iaTono").value;
+      configAgente.longitud = document.getElementById("iaLongitud").value;
+      configAgente.demora = Number(document.getElementById("iaDemora").value) || 3;
+      configAgente.limiteMensajes = Number(document.getElementById("iaLimiteMensajes").value) || 20;
+      configAgente.mensajeTransferencia = document.getElementById("iaMensajeTransferencia").value.trim();
+      configAgente.sonidoActivo = document.getElementById("checkSonidoActivo").checked;
+      configAgente.tgBotToken = document.getElementById("tgBotToken").value.trim();
+      configAgente.tgChatId = document.getElementById("tgChatId").value.trim();
+      guardarMemoria();
+    };
+
+    // =========================================================================
+    // ROLES, NAVEGACIÓN, CATÁLOGO, TABLERO Y CHATS
+    // =========================================================================
     window.guardarConfigComentario = function(nuevoTexto) {
       textoRespuestaComentario = nuevoTexto.trim() || "Te hemos enviado un DM 📨";
       guardarMemoria();
     };
 
-    // 1. Control de Roles (Admin vs Usuario Adjunto)
     window.cambiarRolSistema = function(nuevoRol) {
       rolActual = nuevoRol;
       const esAdmin = rolActual === "admin";
@@ -220,9 +410,6 @@ import BandejaChats from '../components/BandejaChats.astro';
 
       const badge = document.getElementById("badgeRolActual");
       badge.textContent = esAdmin ? "👑 Admin" : "👤 Usuario Adjunto";
-      badge.className = esAdmin
-        ? "text-[11px] font-bold uppercase px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-400/30"
-        : "text-[11px] font-bold uppercase px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30";
 
       document.querySelectorAll(".solo-admin").forEach(el => {
         el.style.display = esAdmin ? "" : "none";
@@ -239,8 +426,6 @@ import BandejaChats from '../components/BandejaChats.astro';
       renderizarTablero();
     };
 
-    // 2. Navegación entre módulos
-    let moduloActivoActual = "tablero";
     window.mostrarModulo = function(modulo) {
       if (rolActual !== "admin" && ["catalogo", "agente", "stats"].includes(modulo)) {
         alert("Acceso restringido: Tu rol de Usuario Adjunto solo permite atender la Bandeja de Chats y el Tablero de Clientes.");
@@ -259,7 +444,6 @@ import BandejaChats from '../components/BandejaChats.astro';
       });
     };
 
-    // 3. Renderizar Catálogo y Selectores de Productos
     function renderizarCatalogo() {
       const contenedor = document.getElementById("listaProductosCatalogo");
       const selectProdModal = document.getElementById("cliProducto");
@@ -287,12 +471,11 @@ import BandejaChats from '../components/BandejaChats.astro';
         </div>
       `).join("");
 
-      const opcionesHTML = catalogo.map(p => `<option value="${p.id}">${p.nombre} ($${p.precio})</option>`).join("");
       if (selectProdModal) {
         selectProdModal.innerHTML = catalogo.map(p => `<option value="${p.nombre} ($${p.precio})">${p.nombre} ($${p.precio})</option>`).join("");
       }
       if (selectProdSimulador) {
-        selectProdSimulador.innerHTML = opcionesHTML;
+        selectProdSimulador.innerHTML = catalogo.map(p => `<option value="${p.id}">${p.nombre} ($${p.precio})</option>`).join("");
       }
     }
 
@@ -317,7 +500,6 @@ import BandejaChats from '../components/BandejaChats.astro';
       e.target.reset();
     });
 
-    // 4. Renderizar Tablero Kanban
     function renderizarTablero() {
       ETAPAS.forEach(etapa => {
         const lista = clientes.filter(c => c.etapa === etapa);
@@ -336,15 +518,12 @@ import BandejaChats from '../components/BandejaChats.astro';
                 <h4 class="font-bold text-sm text-slate-900">${c.nombre}</h4>
                 <span class="mono text-[11px] text-indigo-600 font-semibold">${c.ig || "Sin IG"}</span>
               </div>
-              ${rolActual === "admin" ? `<button onclick="eliminarCliente('${c.id}')" class="text-[11px] text-slate-400 hover:text-rose-600" title="Solo el Admin puede borrar">🗑️</button>` : ""}
+              ${rolActual === "admin" ? `<button onclick="eliminarCliente('${c.id}')" class="text-[11px] text-slate-400 hover:text-rose-600">🗑️</button>` : ""}
             </div>
-
             <div class="text-xs font-semibold text-slate-800 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-200/60">
               🛍️ ${c.producto}
             </div>
-
             ${c.nota ? `<p class="text-xs text-slate-600 italic">"${c.nota}"</p>` : ""}
-
             <div class="pt-1 flex items-center gap-1.5">
               <select onchange="moverEtapaCliente('${c.id}', this.value)" class="flex-1 text-xs font-semibold bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 text-slate-700">
                 ${ETAPAS.map(e => `<option value="${e}" ${e === c.etapa ? "selected" : ""}>${e}</option>`).join("")}
@@ -361,18 +540,21 @@ import BandejaChats from '../components/BandejaChats.astro';
     window.irAlChatDelCliente = function(clienteId) {
       const chat = chats.find(ch => ch.clienteId === clienteId);
       mostrarModulo("chats");
-      if (chat) {
-        seleccionarChat(chat.id);
-      }
+      if (chat) seleccionarChat(chat.id);
     };
 
     window.moverEtapaCliente = function(id, nuevaEtapa) {
       const cli = clientes.find(c => c.id === id);
       if (cli) {
         cli.etapa = nuevaEtapa;
+        // Condición de parada automática: si entra a Esperando pago o Vendido, el Agente IA cede el control al humano
+        const ch = chats.find(chat => chat.clienteId === id);
+        if (ch && ["Esperando pago", "Vendido"].includes(nuevaEtapa)) {
+          ch.estado = "humano";
+        }
         guardarMemoria();
         renderizarTablero();
-        renderizarChatActivo();
+        renderizarBandejaChats();
       }
     };
 
@@ -385,7 +567,6 @@ import BandejaChats from '../components/BandejaChats.astro';
       renderizarBandejaChats();
     };
 
-    // 5. MOTOR DE LA FASE 2: Automatizador de Comentarios y Bandeja de Chats
     function actualizarContadoresBandeja() {
       const cantHumano = chats.filter(c => c.estado === "humano").length;
       const cantNoLeido = chats.filter(c => c.noLeido).length;
@@ -436,22 +617,18 @@ import BandejaChats from '../components/BandejaChats.astro';
           <div onclick="seleccionarChat('${ch.id}')" class="p-3.5 cursor-pointer transition hover:bg-slate-50 ${activo ? 'bg-indigo-50/70 border-l-4 border-indigo-600' : ''}">
             <div class="flex items-start justify-between gap-2">
               <div class="flex items-center gap-2">
-                ${ch.noLeido ? `<span class="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0" title="Por leer"></span>` : ""}
+                ${ch.noLeido ? `<span class="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0"></span>` : ""}
                 <h4 class="font-extrabold text-sm text-slate-900">${ch.nombre}</h4>
               </div>
               <span class="text-[10px] font-semibold text-slate-400">${ch.hora}</span>
             </div>
-
             <div class="flex items-center gap-1.5 mt-1">
               <span class="mono text-[11px] text-indigo-600 font-semibold">${ch.ig}</span>
               <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${ch.estado === 'humano' ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-800'}">
                 ${ch.estado === 'humano' ? '🔴 Requiere Humano' : '🤖 Atendido por IA'}
               </span>
             </div>
-
-            <p class="text-xs text-slate-600 truncate mt-1.5">
-              ${ultimoMsg ? ultimoMsg.texto : ""}
-            </p>
+            <p class="text-xs text-slate-600 truncate mt-1.5">${ultimoMsg ? ultimoMsg.texto : ""}</p>
           </div>
         `;
       }).join("");
@@ -463,7 +640,7 @@ import BandejaChats from '../components/BandejaChats.astro';
       chatSeleccionadoId = id;
       const ch = chats.find(c => c.id === id);
       if (ch) {
-        ch.noLeido = false; // Al abrirlo se marca como leído
+        ch.noLeido = false;
         guardarMemoria();
       }
       renderizarBandejaChats();
@@ -474,11 +651,7 @@ import BandejaChats from '../components/BandejaChats.astro';
       const header = document.getElementById("headerChatActivo");
       const contenedorMensajes = document.getElementById("mensajesChatActivo");
 
-      if (!ch) {
-        header.innerHTML = `<p class="text-xs text-slate-400">Selecciona una conversación</p>`;
-        contenedorMensajes.innerHTML = "";
-        return;
-      }
+      if (!ch) return;
 
       const clienteVinculado = clientes.find(cli => cli.id === ch.clienteId);
       const etapaActual = clienteVinculado ? clienteVinculado.etapa : "Pidió info";
@@ -492,11 +665,10 @@ import BandejaChats from '../components/BandejaChats.astro';
               Origen: ${ch.origen}
             </span>
           </div>
-          <p class="text-xs text-slate-500 mt-0.5">Interés: <strong>${ch.producto}</strong></p>
+          <p class="text-xs text-slate-500 mt-0.5">Interés: <strong>${ch.producto}</strong> • Tono IA: <strong>${configAgente.tono}</strong></p>
         </div>
 
         <div class="flex flex-wrap items-center gap-2">
-          <!-- Cambiar estado entre IA y Humano -->
           <button onclick="alternarModoAgenteChat('${ch.id}')" class="px-3 py-1.5 rounded-xl text-xs font-bold border transition ${
             ch.estado === 'humano'
               ? 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100'
@@ -505,7 +677,6 @@ import BandejaChats from '../components/BandejaChats.astro';
             ${ch.estado === 'humano' ? '🔴 Atendiendo Humano (Reactivar IA)' : '🤖 Agente IA Activo (Derivar a Humano)'}
           </button>
 
-          <!-- Cambiar etapa del cliente directamente desde el chat -->
           ${clienteVinculado ? `
             <select onchange="moverEtapaCliente('${clienteVinculado.id}', this.value)" class="text-xs font-bold bg-white border border-slate-300 rounded-xl px-2.5 py-1.5 text-slate-800">
               ${ETAPAS.map(e => `<option value="${e}" ${e === etapaActual ? "selected" : ""}>Etapa: ${e}</option>`).join("")}
@@ -541,7 +712,7 @@ import BandejaChats from '../components/BandejaChats.astro';
         const esCliente = m.autor === "cliente_dm";
         const etiquetaAutor = esCliente
           ? `${ch.nombre} (DM)`
-          : (m.autor === "ia_dm" ? "🤖 Agente IA (DM automático)" : "👩‍💻 Asesor Humano (Tú)");
+          : (m.autor === "ia_dm" ? "🤖 Agente IA" : "👩‍💻 Asesor Humano");
 
         return `
           <div class="flex flex-col ${esCliente ? 'items-start' : 'items-end'}">
@@ -568,7 +739,71 @@ import BandejaChats from '../components/BandejaChats.astro';
       renderizarBandejaChats();
     };
 
-    // 6. Simulador de Comentarios en Post y DMs Entrantes
+    // Seguimiento por inactividad: Exactamente 1 oración, sin saludos, continuando el tema del cliente
+    window.ejecutarSeguimientoInactividad = function() {
+      const ch = chats.find(c => c.id === chatSeleccionadoId);
+      if (!ch) return;
+
+      const oracionSeguimiento = `Quedo pendiente por aquí para confirmarte la disponibilidad de tu talla en ${ch.producto} y ayudarte a reservarla cuando gustes.`;
+
+      ch.mensajes.push({
+        autor: "ia_dm",
+        texto: oracionSeguimiento,
+        hora: "Seguimiento 15m"
+      });
+
+      guardarMemoria();
+      renderizarBandejaChats();
+    };
+
+    // Simular respuesta del cliente en DM + Detección de Compra con Sonido y Telegram
+    window.simularRespuestaClienteDM = function(textoCliente) {
+      const ch = chats.find(c => c.id === chatSeleccionadoId);
+      if (!ch) return;
+
+      ch.mensajes.push({
+        autor: "cliente_dm",
+        texto: textoCliente,
+        hora: "Ahora"
+      });
+
+      const quiereComprar = textoCliente.toLowerCase().includes("comprar") || textoCliente.toLowerCase().includes("pago");
+      const cli = clientes.find(c => c.id === ch.clienteId);
+
+      if (quiereComprar) {
+        ch.estado = "humano";
+        ch.noLeido = true;
+        if (cli) {
+          cli.etapa = "Esperando pago";
+          cli.nota = "🔥 Listo para comprar -> Alerta enviada a Admin y Telegram.";
+        }
+
+        // Usa el mensaje de transferencia configurado en Ajustes del Agente
+        ch.mensajes.push({
+          autor: "ia_dm",
+          texto: configAgente.mensajeTransferencia,
+          hora: "Ahora"
+        });
+        ch.mensajes.push({
+          autor: "sistema",
+          texto: "🔴 Intención de compra detectada: El Agente IA pausó su respuesta, activó la alerta sonora y envió el respaldo a Telegram.",
+          hora: "Ahora"
+        });
+
+        dispararAlertaCompra(ch.nombre, ch.ig, ch.producto, textoCliente);
+      } else {
+        ch.mensajes.push({
+          autor: "ia_dm",
+          texto: `Sobre ${ch.producto}, contamos con disponibilidad inmediata. Si deseas reservar tu talla, confírmame por aquí para pasarte con nuestro especialista 😊`,
+          hora: "Ahora"
+        });
+      }
+
+      guardarMemoria();
+      renderizarTablero();
+      renderizarBandejaChats();
+    };
+
     document.getElementById("formSimularInteraccionIG").addEventListener("submit", function(e) {
       e.preventDefault();
       const tipo = document.getElementById("simTipoEntrada").value;
@@ -582,36 +817,17 @@ import BandejaChats from '../components/BandejaChats.astro';
       const nuevoCliId = "cli-" + Date.now();
       const nuevoChatId = "chat-" + Date.now();
 
-      // Construir el mensaje exacto del Agente IA usando los datos del producto en tu Catálogo
       const respuestaDM = `¡Hola! Un gusto saludarte. El costo de ${producto.nombre} es de $${producto.precio}, ${producto.variantes} por si te interesa. ¿Qué talla o modelo buscas?`;
 
       const nuevosMensajes = [];
       if (tipo === "comentario") {
-        nuevosMensajes.push({
-          autor: "comentario_cliente",
-          texto: texto,
-          hora: "Ahora"
-        });
-        nuevosMensajes.push({
-          autor: "comentario_bot",
-          texto: textoRespuestaComentario,
-          hora: "Ahora"
-        });
+        nuevosMensajes.push({ autor: "comentario_cliente", texto: texto, hora: "Ahora" });
+        nuevosMensajes.push({ autor: "comentario_bot", texto: textoRespuestaComentario, hora: "Ahora" });
       } else {
-        nuevosMensajes.push({
-          autor: "cliente_dm",
-          texto: texto,
-          hora: "Ahora"
-        });
+        nuevosMensajes.push({ autor: "cliente_dm", texto: texto, hora: "Ahora" });
       }
+      nuevosMensajes.push({ autor: "ia_dm", texto: respuestaDM, hora: "Ahora" });
 
-      nuevosMensajes.push({
-        autor: "ia_dm",
-        texto: respuestaDM,
-        hora: "Ahora"
-      });
-
-      // 1. Crear el cliente automáticamente en el Tablero Kanban
       clientes.unshift({
         id: nuevoCliId,
         nombre: nombre,
@@ -623,7 +839,6 @@ import BandejaChats from '../components/BandejaChats.astro';
           : `Escribió al DM "${texto}" -> Atendido por el Agente IA.`
       });
 
-      // 2. Crear la conversación en la Bandeja de Chats
       chats.unshift({
         id: nuevoChatId,
         clienteId: nuevoCliId,
@@ -644,49 +859,6 @@ import BandejaChats from '../components/BandejaChats.astro';
       e.target.reset();
     });
 
-    // 7. Simular qué pasa cuando el cliente responde dentro del DM
-    window.simularRespuestaClienteDM = function(textoCliente) {
-      const ch = chats.find(c => c.id === chatSeleccionadoId);
-      if (!ch) return;
-
-      ch.mensajes.push({
-        autor: "cliente_dm",
-        texto: textoCliente,
-        hora: "Ahora"
-      });
-
-      const quiereComprar = textoCliente.toLowerCase().includes("comprar") || textoCliente.toLowerCase().includes("pago");
-      const cli = clientes.find(c => c.id === ch.clienteId);
-
-      if (quiereComprar) {
-        ch.estado = "humano";
-        ch.noLeido = true;
-        if (cli) cli.etapa = "Esperando pago";
-
-        ch.mensajes.push({
-          autor: "ia_dm",
-          texto: "¡Excelente elección! 🙌 Ya mismo te paso con nuestro administrador para compartirte los datos de pago y coordinar tu entrega.",
-          hora: "Ahora"
-        });
-        ch.mensajes.push({
-          autor: "sistema",
-          texto: "🔴 El cliente quiere comprar: Conversación derivada a un usuario Admin/Humano y movida a la etapa 'Esperando pago'.",
-          hora: "Ahora"
-        });
-      } else {
-        ch.mensajes.push({
-          autor: "ia_dm",
-          texto: `Sobre ${ch.producto}, contamos con disponibilidad inmediata. Si deseas reservar tu talla, confírmame por aquí y te paso con un asesor para el pago 😊`,
-          hora: "Ahora"
-        });
-      }
-
-      guardarMemoria();
-      renderizarTablero();
-      renderizarBandejaChats();
-    };
-
-    // 8. Enviar mensaje como Asesor Humano desde la caja de texto
     document.getElementById("formEnviarMensajeHumano").addEventListener("submit", function(e) {
       e.preventDefault();
       const input = document.getElementById("inputMensajeHumano");
@@ -696,13 +868,8 @@ import BandejaChats from '../components/BandejaChats.astro';
       const ch = chats.find(c => c.id === chatSeleccionadoId);
       if (!ch) return;
 
-      ch.mensajes.push({
-        autor: "humano_dm",
-        texto: texto,
-        hora: "Ahora"
-      });
+      ch.mensajes.push({ autor: "humano_dm", texto: texto, hora: "Ahora" });
       ch.noLeido = false;
-
       guardarMemoria();
       renderizarBandejaChats();
       input.value = "";
@@ -738,9 +905,7 @@ import BandejaChats from '../components/BandejaChats.astro';
         estado: "humano",
         noLeido: false,
         hora: "Ahora",
-        mensajes: [
-          { autor: "sistema", texto: `Cliente registrado manualmente en etapa: ${etapa}`, hora: "Ahora" }
-        ]
+        mensajes: [{ autor: "sistema", texto: `Cliente registrado manualmente en etapa: ${etapa}`, hora: "Ahora" }]
       });
 
       guardarMemoria();
@@ -750,8 +915,9 @@ import BandejaChats from '../components/BandejaChats.astro';
       e.target.reset();
     });
 
-    // Inicializar todo el CRM
+    // Inicializar todo el CRM (Fase 1 + 2 + 3)
     document.getElementById("inputRespuestaComentarioPublico").value = textoRespuestaComentario;
+    cargarFormularioAgente();
     renderizarCatalogo();
     renderizarTablero();
     renderizarBandejaChats();

@@ -119,17 +119,20 @@
       <!-- Historial de Mensajes (Comentario + DMs) -->
       <div id="mensajesChatActivo" class="flex-1 overflow-y-auto p-5 space-y-4 bg-slate-50/50"></div>
 
-      <!-- Barra de Simulación Rápida: ¿Qué responde el cliente dentro del DM? -->
-      <div id="barraSimularRespuestaCliente" class="px-4 py-2 bg-indigo-50/80 border-t border-indigo-100 flex flex-wrap items-center justify-between gap-2">
-        <span class="text-[11px] font-bold text-indigo-900">
-          🧪 Simular respuesta del cliente en este DM:
+      <!-- Barra de Simulación Rápida: ¿Qué responde el cliente o qué hace el Agente? -->
+      <div id="barraSimularRespuestaCliente" class="px-4 py-2.5 bg-indigo-50/90 border-t border-indigo-100 flex flex-wrap items-center justify-between gap-2">
+        <span class="text-[11px] font-bold text-indigo-950">
+          🧪 Probar situaciones reales en este chat:
         </span>
         <div class="flex flex-wrap items-center gap-1.5">
           <button onclick="simularRespuestaClienteDM('¿Qué otras tallas o colores tienen?')" class="px-2.5 py-1 rounded-lg bg-white hover:bg-indigo-100 text-indigo-800 border border-indigo-200 text-[11px] font-semibold transition">
-            "¿Qué otras tallas tienen?"
+            Cliente: "¿Qué otras tallas tienen?"
+          </button>
+          <button onclick="ejecutarSeguimientoInactividad()" class="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 text-[11px] font-extrabold shadow-sm transition" title="Aplica tu regla: Exactamente 1 oración, sin saludos">
+            ⏱️ Simular 15m sin respuesta (IA 1 oración)
           </button>
           <button onclick="simularRespuestaClienteDM('¡La quiero comprar! ¿Cuáles son los datos de pago?')" class="px-2.5 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold shadow-sm transition">
-            🔥 "¡La quiero comprar! ¿Datos de pago?"
+            🔥 Cliente: "¡La quiero comprar!" (Dispara Sonido + Telegram)
           </button>
         </div>
       </div>

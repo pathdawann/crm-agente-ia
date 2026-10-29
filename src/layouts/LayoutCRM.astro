@@ -34,7 +34,7 @@ const { title } = Astro.props;
               👑 Admin
             </span>
           </div>
-          <p class="text-[11px] text-slate-400 hidden sm:block">Fase 1: Estructura Base, Control de Roles y Catálogo de Productos</p>
+          <p class="text-[11px] text-slate-400 hidden sm:block">Fase 3: Agente IA Entrenado, Derivación a Humano, Sonido y Telegram</p>
         </div>
       </div>
 
@@ -72,9 +72,9 @@ const { title } = Astro.props;
           <span class="text-[10px] bg-indigo-100 text-indigo-700 font-bold px-1.5 py-0.5 rounded-md">Admin</span>
         </button>
 
-        <button id="nav-agente" onclick="mostrarModulo('agente')" class="solo-admin px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-500 hover:bg-slate-100 transition flex items-center gap-2">
+        <button id="nav-agente" onclick="mostrarModulo('agente')" class="solo-admin px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-100 transition flex items-center gap-2">
           🤖 Configurar Agente IA
-          <span class="text-[10px] bg-slate-100 text-slate-600 font-bold px-1.5 py-0.5 rounded-md">Fase 3</span>
+          <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded-md">Activo</span>
         </button>
 
         <button id="nav-stats" onclick="mostrarModulo('stats')" class="solo-admin px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-500 hover:bg-slate-100 transition flex items-center gap-2">
@@ -95,6 +95,27 @@ const { title } = Astro.props;
   <main class="flex-1 max-w-[1600px] w-full mx-auto px-4 sm:px-6 py-6">
     <slot />
   </main>
+
+  <!-- Alerta Emergente en Pantalla cuando un cliente quiere comprar -->
+  <div id="toastAlertaVenta" class="fixed bottom-5 right-5 z-50 hidden max-w-sm bg-slate-900 text-white border-2 border-rose-500 rounded-2xl p-4 shadow-2xl">
+    <div class="flex items-start justify-between gap-3">
+      <div class="flex items-center gap-2.5">
+        <span class="w-9 h-9 rounded-xl bg-rose-600 flex items-center justify-center text-lg shrink-0">🔔</span>
+        <div>
+          <span class="text-[10px] font-extrabold uppercase tracking-wider text-rose-400 block">¡Cliente listo para comprar!</span>
+          <h4 id="toastTituloCliente" class="font-extrabold text-sm text-white">Nombre Cliente</h4>
+        </div>
+      </div>
+      <button onclick="cerrarToastAlerta()" class="text-slate-400 hover:text-white text-xs font-bold">✕</button>
+    </div>
+    <p id="toastDetalleVenta" class="text-xs text-slate-300 mt-2"></p>
+    <div class="mt-3 pt-2 border-t border-slate-800 flex items-center justify-between">
+      <span class="text-[10px] text-sky-400 font-semibold">✈️ Respaldo enviado a Telegram</span>
+      <button onclick="mostrarModulo('chats'); cerrarToastAlerta();" class="px-3 py-1 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold">
+        Atender Chat ➔
+      </button>
+    </div>
+  </div>
 
 </body>
 </html>
