@@ -1,0 +1,68 @@
+---
+// Componente: Catálogo de Productos (Solo accesible por el Administrador)
+---
+<section id="modulo-catalogo" class="hidden space-y-6">
+  
+  <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">
+        Módulo Exclusivo Administrador
+      </span>
+      <h2 class="text-xl font-extrabold text-slate-900 mt-1">📦 Mi Catálogo de Productos y Palabras Clave</h2>
+      <p class="text-sm text-slate-500">
+        El Agente de IA usará estos precios, tallas y palabras clave para responder comentarios de Instagram y enviar el DM automático.
+      </p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    
+    <!-- Formulario para agregar producto -->
+    <div class="lg:col-span-4 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm h-fit">
+      <h3 class="font-bold text-base text-slate-900 mb-4">➕ Agregar Producto al Catálogo</h3>
+      
+      <form id="formNuevoProducto" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Nombre del Producto *</label>
+          <input type="text" id="prodNombre" required placeholder="Ej. Franela Negra Talla XS" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-indigo-600" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Precio ($) *</label>
+            <input type="number" id="prodPrecio" required placeholder="25" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-indigo-600" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Stock / Estado</label>
+            <select id="prodStock" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:border-indigo-600">
+              <option value="Disponible">Disponible</option>
+              <option value="Pocas unidades">Pocas unidades</option>
+              <option value="Agotado">Agotado</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Tallas / Modelos / Detalles *</label>
+          <input type="text" id="prodVariantes" required placeholder="Ej. También tenemos S, M, L y otros colores" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-indigo-600" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Palabras Clave en Comentarios (Keywords) *</label>
+          <input type="text" id="prodKeywords" required placeholder="Ej. precio, franela, negra, info" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-indigo-600" />
+          <p class="text-[11px] text-slate-400 mt-1">Sepáralas con comas. Si alguien comenta esto en IG, el bot le enviará este producto al DM.</p>
+        </div>
+
+        <button type="submit" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow transition">
+          Guardar Producto en Catálogo
+        </button>
+      </form>
+    </div>
+
+    <!-- Lista de productos cargados -->
+    <div class="lg:col-span-8 space-y-4">
+      <div id="listaProductosCatalogo" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </div>
+
+  </div>
+</section>
